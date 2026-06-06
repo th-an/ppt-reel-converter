@@ -1,10 +1,6 @@
 import { useState, useCallback } from 'react'
 import type {
   AppState,
-  SlideFingerprint,
-  ProcessSlideResponse,
-  ApprovalAction,
-  TemplateConfig,
 } from './types'
 
 function App() {
@@ -20,26 +16,18 @@ function App() {
     error: null,
   })
 
-  const [filePath, setFilePath] = useState<string>('')
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [results, setResults] = useState<Record<number, ProcessSlideResponse>>({})
-
   const handleFileSelect = useCallback(async () => {
     try {
       const path = await (window as any).electronAPI.selectFile()
       if (path) {
-        setFilePath(path)
         setAppState(prev => ({ ...prev, phase: 'scanning' }))
         
-        // Start processing
-        setIsProcessing(true)
         const response = await (window as any).electronAPI.startPythonSidecar({
           filePath: path,
           templateStyle: appState.selectedTemplate,
         })
         
         console.log('Processing complete:', response)
-        setIsProcessing(false)
         setAppState(prev => ({
           ...prev,
           phase: 'complete',
@@ -49,7 +37,6 @@ function App() {
     } catch (error) {
       console.error('Error:', error)
       setAppState(prev => ({ ...prev, error: String(error), phase: 'upload' }))
-      setIsProcessing(false)
     }
   }, [appState.selectedTemplate])
 
@@ -96,8 +83,8 @@ function App() {
               <svg className="mx-auto h-16 w-16 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v3.75M3.375 19.5h9.75m1.125-9.75H15M3.375 19.5c-.621 0-1.125-.504-1.125-1.125V4.125c0-.621.504-1.125 1.125-1.125h6.75c.621 0 1.125.504 1.125 1.125v4.5" />
               </svg>
-              <p className="mt-6 text-lg text-gray-300">Drop a landscape PPTX file here</p>
-              <p className="mt-2 text-sm text-gray-500">or click to browse</p>
+              <p className="mt-6 text-lg text-gray-300">Click to select a landscape PPTX file</p>
+              <p className="mt-2 text-sm text-gray-500">The file will be processed slide by slide</p>
               <div className="mt-6 flex justify-center gap-2">
                 {['reel_clean', 'reel_modern', 'reel_bold', 'reel_minimal', 'reel_corporate'].map((style) => (
                   <button
@@ -147,7 +134,7 @@ function App() {
             <div className="w-full bg-gray-800 rounded-full h-2 mb-8">
               <div
                 className="bg-blue-600 h-2 rounded-full transition-all"
-                style={{ width: `${((appState.currentSlideIndex + 1) / appState.totalSlides) * 100}%` }}
+                style={{ width: `${appState.totalSlides > 0 ? ((appState.currentSlideIndex + 1) / appState.totalSlides) * 100 : 0}%` }}
               ></div>
             </div>
 
@@ -194,11 +181,11 @@ function App() {
                     <div className="aspect-[9/16] bg-gray-800 rounded-lg p-4 flex items-center justify-center max-h-64">
                       <div className="text-center">
                         <p className="text-lg font-bold text-blue-400">
-                          {appState.currentResult.scenes[0]?.headline || 'No Title'}
+                          {appState.currentResult.scenes[0]?.placeholders_filled?.title || 'No Title'}
                         </p>
                         <div className="text-xs text-gray-400 mt-2 space-y-1">
-                          {appState.currentResult.scenes.map((scene, i) => (
-                            <p key={i}>Scene {i + 1}: {scene.layout}</p>
+                          {appState.currentResult.scenes.map((scene, i: number) => (
+                            <p key={i}>Scene {i + 1}: {scene.layout_used}</p>
                           ))}
                         </div>
                       </div>
@@ -258,11 +245,11 @@ function App() {
                 </div>
 
                 {/* Validation details */}
-                {appState.currentResult.gate4.flags.length > 0 && (
+                {appState.currentResult.gate4.details.flags.length > 0 && (
                   <div className="mt-4 bg-yellow-900/20 border border-yellow-700/50 rounded-lg p-3">
                     <p className="text-sm font-semibold text-yellow-400 mb-2">Validation Flags</p>
                     <ul className="text-sm text-yellow-300/80 space-y-1">
-                      {appState.currentResult.gate4.flags.map((flag, i) => (
+                      {appState.currentResult.gate4.details.flags.map((flag: string, i: number) => (
                         <li key={i}>• {flag}</li>
                       ))}
                     </ul>

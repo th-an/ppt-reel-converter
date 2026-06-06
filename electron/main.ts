@@ -1,6 +1,10 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import path from 'path'
+import { fileURLToPath } from 'url'
 import { spawn } from 'child_process'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 let mainWindow: BrowserWindow | null = null
 let pythonProcess: ReturnType<typeof spawn> | null = null
@@ -17,10 +21,10 @@ function createWindow() {
   })
 
   if (process.env.NODE_ENV === 'development') {
-    mainWindow.loadURL('http://localhost:5173')
+    mainWindow.loadFile(path.join(__dirname, '../index.html'))
     mainWindow.webContents.openDevTools()
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
+    mainWindow.loadFile(path.join(__dirname, '../index.html'))
   }
 }
 

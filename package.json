@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "description": "Convert landscape PPTX presentations to Instagram Reel (9:16) portrait scenes with AI-assisted layout and per-slide validation gates",
-  "main": "electron/main.js",
+  "type": "module",
+  "main": "dist/electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
