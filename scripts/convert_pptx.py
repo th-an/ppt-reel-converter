@@ -32,6 +32,8 @@ def main():
     parser.add_argument("--export-png", action="store_true", help="Also export PNG images")
     parser.add_argument("--api-key", help="API key (or set OPENCODE_API_KEY env var)")
     parser.add_argument("--api-base", help="API base URL")
+    parser.add_argument("--auto-approve", action="store_true", help="Auto-approve slides with score >= 80")
+    parser.add_argument("--auto-approve-threshold", type=float, default=80.0, help="Auto-approve threshold (default: 80)")
     
     args = parser.parse_args()
     
@@ -51,6 +53,8 @@ def main():
     print(f"🎯 Converting {args.input} to Reel format")
     print(f"📐 Template: {args.template} ({template_config.dimensions.width_emu} x {template_config.dimensions.height_emu} EMU)")
     print(f"🤖 Model: {args.model} (preset: {args.preset})")
+    if args.auto_approve:
+        print(f"⚡ Auto-approve: enabled (threshold: {args.auto_approve_threshold})")
     print()
     
     # Initialize orchestrator
@@ -60,6 +64,7 @@ def main():
         preset=args.preset,
         temperature=args.temperature,
         api_key=args.api_key,
+        auto_approve_threshold=args.auto_approve_threshold if args.auto_approve else 999.0,
     )
     
     # Process each slide

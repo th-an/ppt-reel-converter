@@ -45,6 +45,20 @@
 - `.env.example` for API key
 - `.gitignore` for node_modules, dist, venv, output
 - Test fixture created (`simple_test.pptx` with 2 slides)
+- Complex test fixture created (`complex_test.pptx` with 5 slides)
+
+### CLI Features (NEW)
+- **Combined conversion**: `scripts/convert_pptx.py` converts entire PPTX to single combined reel
+- **Auto-approve mode**: `--auto-approve` flag automatically approves slides scoring ≥80
+- **PNG export**: `--export-png` flag exports all scenes as PNG images
+- **Template selection**: `--template` supports all 5 templates
+- **Multi-model support**: `--model` and `--preset` flags for AI model selection
+
+### Electron Packaging (NEW)
+- **macOS DMG**: Successfully builds `.dmg` installer
+- **macOS ZIP**: Successfully builds `.zip` distributable
+- **Dev server**: Fixed to load from `http://localhost:5173` in development
+- **Build process**: Fixed TypeScript compilation order for electron main process
 
 ---
 
@@ -79,6 +93,35 @@ $ python -m reel_converter.cli --list-models
 ✓ Lists all 14 models with cost/format
 ✓ Presets displayed
 ✓ Help text shows all flags
+
+$ python scripts/convert_pptx.py tests/fixtures/simple_test.pptx --output output --export-png
+✓ Combined reel generated
+✓ 3 PNGs exported
+✓ Summary JSON saved
+
+$ python scripts/convert_pptx.py tests/fixtures/simple_test.pptx --output output_auto --auto-approve
+✓ Auto-approve enabled
+✓ All slides passed threshold
+```
+
+### Complex Slide Test
+```
+$ python scripts/convert_pptx.py tests/fixtures/complex_test.pptx --output output_complex --export-png
+Slide 1 (title_only): 1 scene → title_only
+Slide 2 (bullets): 2 scenes → title_and_content (split)
+Slide 3 (title_only): 1 scene → title_only
+Slide 4 (stat_with_context): 2 scenes → stat scenes
+Slide 5 (title_only): 1 scene → title_only
+✓ 7 reel scenes from 5 slides
+✓ 7 PNGs exported
+```
+
+### API Key Test
+```
+$ python scripts/test_all_models_verbose.py
+✓ 6/14 models working (deepseek-v4-flash, deepseek-v4-pro, kimi-k2.5, kimi-k2.6, mimo-v2.5, mimo-v2.5-pro)
+✗ 2/14 models failing (glm-5, glm-5.1 - empty response)
+✗ 6/14 models failing (minimax*, qwen* - 401 Unauthorized)
 ```
 
 ---
@@ -87,16 +130,11 @@ $ python -m reel_converter.cli --list-models
 
 | Priority | Task | Status | Est. Time |
 |----------|------|--------|-----------|
-| 🔴 HIGH | Profile remaining 4 templates (modern, bold, minimal, corporate) | **Pending** | 2 days |
-| 🔴 HIGH | Live OpenCode Go API test with real API key | **Pending** | 1 day |
-| 🟡 MEDIUM | PNG export (LibreOffice headless) — basic implementation done | **Pending** | 2 days |
+| 🔴 HIGH | Complex slide handling (images, charts, tables) | **Pending** | 2 days |
 | 🟡 MEDIUM | Electron UI polish (drag-drop, animations, responsive) | **Pending** | 3 days |
-| 🟡 MEDIUM | Test template placeholder system with complex slides | **Pending** | 2 days |
-| 🟡 MEDIUM | Electron UI polish (drag-drop, animations, responsive) | **Pending** | 3 days |
-| 🟢 LOW | Visual validator (render PNG + detect text clipping) | **Pending** | 2 days |
+| 🟡 MEDIUM | Visual validator (render PNG + detect text clipping) | **Pending** | 2 days |
 | 🟢 LOW | Content editor (inline text editing before approval) | **Pending** | 2 days |
-| 🟢 LOW | Auto-approve mode (approve all slides scoring ≥80) | **Pending** | 0.5 day |
-| 🟢 LOW | Packaging (DMG, EXE, AppImage) | **Pending** | 1 day |
+| 🟢 LOW | Windows/Linux packaging (EXE, AppImage) | **Pending** | 1 day |
 
 ---
 

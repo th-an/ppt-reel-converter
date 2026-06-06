@@ -22,12 +22,14 @@ class Orchestrator:
         model: str = "deepseek-v4-flash",
         preset: str = "balanced",
         temperature: float = 0.3,
+        auto_approve_threshold: float = 80.0,
     ):
         self.template_config = template_config
         self.api_key = api_key
         self.model = model
         self.preset = preset
         self.temperature = temperature
+        self.auto_approve_threshold = auto_approve_threshold
         self.results: list[SlideResult] = []
         self.max_gate2_retries = 3
         self.max_gate3_retries = 2
@@ -102,6 +104,10 @@ class Orchestrator:
             result.verification = verification
             if verification.passed:
                 break
+
+        # Auto-approve if score meets threshold
+        if result.verification and result.verification.score >= self.auto_approve_threshold:
+            result.approved = True
 
         return result
 
