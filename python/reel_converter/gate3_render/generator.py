@@ -6,7 +6,7 @@ from ..schemas.scene_plan import ScenePlan, Scene
 from ..schemas.template_config import TemplateConfig
 from ..schemas.render_result import RenderedScene
 from .placeholder_filler import fill_placeholder
-from .content_fitter import fit_content
+from .content_fitter import calculate_fit_font_size, shrink_text_to_fit
 
 
 def generate_scenes(
