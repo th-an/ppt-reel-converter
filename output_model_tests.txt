@@ -1,0 +1,58 @@
+Testing with slide: Q3 Revenue Report
+
+
+Testing deepseek-v4-flash (openai)...
+  Endpoint: https://opencode.ai/zen/go/v1/chat/completions
+  ✅ SUCCESS: 2 scenes
+
+Testing deepseek-v4-pro (openai)...
+  Endpoint: https://opencode.ai/zen/go/v1/chat/completions
+  ✅ SUCCESS: 1 scenes
+
+Testing glm-5 (openai)...
+  Endpoint: https://opencode.ai/zen/go/v1/chat/completions
+  ❌ FAILED: All model attempts failed. Last error: Expecting value: line 1 column 1 (char 0). Tried: glm-5 + 0 f
+
+Testing glm-5.1 (openai)...
+  Endpoint: https://opencode.ai/zen/go/v1/chat/completions
+  ❌ FAILED: All model attempts failed. Last error: Expecting value: line 1 column 1 (char 0). Tried: glm-5.1 + 0
+
+Testing kimi-k2.5 (openai)...
+  Endpoint: https://opencode.ai/zen/go/v1/chat/completions
+  ✅ SUCCESS: 1 scenes
+
+Testing kimi-k2.6 (openai)...
+  Endpoint: https://opencode.ai/zen/go/v1/chat/completions
+  ✅ SUCCESS: 1 scenes
+
+Testing mimo-v2.5 (openai)...
+  Endpoint: https://opencode.ai/zen/go/v1/chat/completions
+  ✅ SUCCESS: 2 scenes
+
+Testing mimo-v2.5-pro (openai)...
+  Endpoint: https://opencode.ai/zen/go/v1/chat/completions
+  ✅ SUCCESS: 3 scenes
+
+Testing minimax-m3 (anthropic)...
+  Endpoint: https://opencode.ai/zen/go/v1/messages
+  ❌ FAILED: All model attempts failed. Last error: Client error '401 Unauthorized' for url 'https://opencode.ai/
+
+Testing minimax-m2.7 (anthropic)...
+  Endpoint: https://opencode.ai/zen/go/v1/messages
+  ❌ FAILED: All model attempts failed. Last error: Client error '401 Unauthorized' for url 'https://opencode.ai/
+
+Testing minimax-m2.5 (anthropic)...
+  Endpoint: https://opencode.ai/zen/go/v1/messages
+  ❌ FAILED: All model attempts failed. Last error: Client error '401 Unauthorized' for url 'https://opencode.ai/
+
+Testing qwen3.7-max (anthropic)...
+  Endpoint: https://opencode.ai/zen/go/v1/messages
+  ❌ FAILED: All model attempts failed. Last error: Client error '401 Unauthorized' for url 'https://opencode.ai/
+
+Testing qwen3.7-plus (anthropic)...
+  Endpoint: https://opencode.ai/zen/go/v1/messages
+  ❌ FAILED: All model attempts failed. Last error: Client error '401 Unauthorized' for url 'https://opencode.ai/
+
+Testing qwen3.6-plus (anthropic)...
+  Endpoint: https://opencode.ai/zen/go/v1/messages
+  ❌ FAILED: All model attempts failed. Last error: Client error '401 Unauthorized' for url 'https://opencode.ai/
