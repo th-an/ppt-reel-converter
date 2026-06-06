@@ -45,8 +45,8 @@ def validate_render(
                 )
 
         expected_images = sum(
-            1 for s in scene_plan.scenes
-            if s.image_name and s.scene_number == scene.scene_number
+            1 for idx, s in enumerate(scene_plan.scenes, start=1)
+            if s.image_name and idx == scene.scene_number
         )
         if len(scene.images_inserted) < expected_images:
             image_count_mismatch.append(scene.scene_number)

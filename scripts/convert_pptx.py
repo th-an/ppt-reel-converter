@@ -16,7 +16,7 @@ from pathlib import Path
 sys.path.insert(0, "python")
 
 from reel_converter.pipeline.orchestrator import Orchestrator
-from reel_converter.profile import profile_template
+from reel_converter.gate1_scan import scan_all_slides
 from reel_converter.gate3_render.png_export import export_pptx_to_pngs
 from reel_converter.schemas.template_config import TemplateConfig
 
@@ -71,10 +71,14 @@ def main():
     all_scenes = []
     slide_results = []
     
-    # Scan all slides
-    fingerprints = orchestrator.scan_all(str(input_path))
+    # Scan all slides (extract images to output dir)
+    image_dir = str(output_dir / "images")
+    fingerprints = scan_all_slides(str(input_path), image_output_dir=image_dir)
     
     print(f"📄 Found {len(fingerprints)} slides")
+    if any(fp.image_paths for fp in fingerprints):
+        total_images = sum(len(fp.image_paths) for fp in fingerprints)
+        print(f"🖼️  Extracted {total_images} images")
     print()
     
     # Process each slide
@@ -98,6 +102,7 @@ def main():
             fingerprint=fingerprint,
             template_config=template_config,
             output_path=output_pptx,
+            original_images=fingerprint.image_paths,
         )
         
         print(f"  ✅ Passed: {pre_quality.passed}")
@@ -113,9 +118,15 @@ def main():
         all_scenes.extend(plan.scenes)
         print()
     
+    # Collect all images from all slides
+    all_images = {}
+    for fp in fingerprints:
+        if fp.image_paths:
+            all_images.update(fp.image_paths)
+    
     # Combine all scenes into a single PPTX
     combined_pptx = str(output_dir / "combined_reel.pptx")
-    _combine_scenes(all_scenes, template_config, combined_pptx)
+    _combine_scenes(all_scenes, template_config, combined_pptx, all_images)
     print(f"🎬 Combined reel: {combined_pptx}")
     
     # Export PNGs if requested
@@ -162,7 +173,7 @@ def _load_template(template_name: str) -> TemplateConfig:
     return TemplateConfig(**data)
 
 
-def _combine_scenes(scenes, template_config, output_path):
+def _combine_scenes(scenes, template_config, output_path, original_images=None):
     """Combine all scenes into a single PPTX file."""
     from reel_converter.gate3_render.pptx_writer import write_scenes_to_pptx
     from reel_converter.schemas.scene_plan import ScenePlan, Scene, CoverageDeclaration
@@ -183,6 +194,7 @@ def _combine_scenes(scenes, template_config, output_path):
         scene_plan=scene_plan,
         template_config=template_config,
         output_path=output_path,
+        original_images=original_images,
     )
 
 

@@ -11,19 +11,23 @@ from .pptx_parser import parse_slide
 from .shape_classifier import classify_shape
 from .number_extractor import extract_numbers
 from .theme_extractor import extract_theme
+from .image_extractor import extract_slide_images
 
 
-def scan_all_slides(file_path: str, template_style: str = "reel_clean") -> list[SlideFingerprint]:
+def scan_all_slides(file_path: str, template_style: str = "reel_clean", image_output_dir: str | None = None) -> list[SlideFingerprint]:
     prs = Presentation(file_path)
     theme = extract_theme(prs)
     fingerprints = []
     for idx, slide in enumerate(prs.slides, start=1):
-        fp = scan_slide(slide, idx, theme, prs.slide_height)
+        images = {}
+        if image_output_dir:
+            images = extract_slide_images(slide, idx, image_output_dir)
+        fp = scan_slide(slide, idx, theme, prs.slide_height, images)
         fingerprints.append(fp)
     return fingerprints
 
 
-def scan_slide(slide, slide_number: int, theme, slide_height: int = 9144000) -> SlideFingerprint:
+def scan_slide(slide, slide_number: int, theme, slide_height: int = 9144000, images: dict[str, str] = None) -> SlideFingerprint:
     elements = parse_slide(slide, slide_height)
     title_text = None
     body_texts = []
@@ -101,6 +105,11 @@ def scan_slide(slide, slide_number: int, theme, slide_height: int = 9144000) -> 
         has_chart=has_chart,
     )
 
+    # If we have extracted images, use those paths
+    if images:
+        image_names = list(images.keys())
+        image_count = len(images)
+    
     return SlideFingerprint(
         slide_number=slide_number,
         title_text=title_text,
@@ -110,6 +119,7 @@ def scan_slide(slide, slide_number: int, theme, slide_height: int = 9144000) -> 
         table_data=table_data,
         image_count=image_count,
         image_names=image_names,
+        image_paths=images or {},
         total_word_count=total_words,
         total_char_count=total_chars,
         unique_numbers=unique_numbers,

@@ -27,6 +27,7 @@ class SlideFingerprint(BaseModel):
     table_data: list[list[str]] = Field(default_factory=list)
     image_count: int = 0
     image_names: list[str] = Field(default_factory=list)
+    image_paths: dict[str, str] = Field(default_factory=dict)
     total_word_count: int = 0
     total_char_count: int = 0
     unique_numbers: list[str] = Field(default_factory=list)

@@ -194,8 +194,24 @@ def _write_scene(
             if scene.image_name and original_images:
                 img_path = original_images.get(scene.image_name)
                 if img_path and Path(img_path).exists():
-                    shape.fill.solid()
-                    shape.fill.fore_color.rgb = RGBColor(0x33, 0x33, 0x33)
+                    # python-pptx doesn't support adding images to picture placeholders directly
+                    # So we add as a shape and position over the placeholder
+                    from PIL import Image as PILImage
+                    with PILImage.open(img_path) as img:
+                        img_w, img_h = img.size
+                    
+                    # Use placeholder dimensions
+                    max_w = shape.width
+                    max_h = shape.height
+                    
+                    ratio = min(max_w / img_w, max_h / img_h)
+                    new_w = int(img_w * ratio)
+                    new_h = int(img_h * ratio)
+                    
+                    left = shape.left + (shape.width - new_w) // 2
+                    top = shape.top + (shape.height - new_h) // 2
+                    
+                    slide.shapes.add_picture(img_path, left, top, new_w, new_h)
                     images_inserted.append(scene.image_name)
                 else:
                     shape.fill.solid()
