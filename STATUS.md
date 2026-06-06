@@ -102,6 +102,15 @@ $ python scripts/convert_pptx.py tests/fixtures/simple_test.pptx --output output
 $ python scripts/convert_pptx.py tests/fixtures/simple_test.pptx --output output_auto --auto-approve
 ✓ Auto-approve enabled
 ✓ All slides passed threshold
+
+$ python scripts/convert_pptx.py tests/fixtures/image_test.pptx --output output_image --export-png
+✓ Image extraction working
+✓ Images inserted into reel scenes
+✓ 3 PNGs exported
+
+$ python scripts/convert_pptx.py tests/fixtures/simple_test.pptx --output output_edit --interactive
+✓ Interactive mode: prompts for text edits
+✓ Scenes edited before rendering
 ```
 
 ### Complex Slide Test
@@ -130,11 +139,11 @@ $ python scripts/test_all_models_verbose.py
 
 | Priority | Task | Status | Est. Time |
 |----------|------|--------|-----------|
-| 🔴 HIGH | Complex slide handling (images, charts, tables) | **Pending** | 2 days |
+| 🔴 HIGH | Complex slide handling (images, charts, tables) | **Complete** | ✅ |
 | 🟡 MEDIUM | Electron UI polish (drag-drop, animations, responsive) | **Pending** | 3 days |
 | 🟡 MEDIUM | Visual validator (text overflow detection) | **Complete** | ✅ |
-| 🟢 LOW | Content editor (inline text editing before approval) | **Pending** | 2 days |
-| 🟢 LOW | Windows/Linux packaging (EXE, AppImage) | **Pending** | 1 day |
+| 🟢 LOW | Content editor (inline text editing before approval) | **Complete** | ✅ |
+| 🟢 LOW | Windows/Linux packaging (EXE, AppImage) | **Complete** | ✅ |
 
 ---
 
@@ -227,6 +236,8 @@ $ python scripts/test_all_models_verbose.py
 | Image Extraction | ✅ **COMPLETE** | Extracts images from PPTX and inserts into reel scenes |
 | Visual Validator | ✅ **COMPLETE** | Text overflow detection using font metrics |
 | Auto-Approve | ✅ **COMPLETE** | Auto-approves slides with score >= threshold |
+| Content Editor | ✅ **COMPLETE** | Interactive text editing before rendering |
+| Cross-Platform Build | ✅ **COMPLETE** | macOS DMG, Windows EXE, Linux AppImage + DEB |
 
 ---
 
