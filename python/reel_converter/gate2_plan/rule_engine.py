@@ -17,13 +17,24 @@ def apply_rules(
     content_type = fingerprint.content_type
     routing = template_config.content_type_routing
     layout_name = routing.get(content_type, template_config.fallback_layout_name)
-    fingerprint.primary_color
+    
+    # Map reel-specific layout names to template layout names
+    layout_map = {
+        "title_scene": "title_only",
+        "stat_scene": "title_and_content",
+        "bullet_scene": "title_and_content",
+        "image_scene": "picture_with_caption",
+        "cta_scene": "title_only",
+        "quote_scene": "title_only",
+        "list_scene": "title_and_content",
+        "section_scene": "section_header",
+    }
 
     scenes = []
 
     if content_type == "title_only":
         scenes.append(Scene(
-            layout=layout_name or "title_scene",
+            layout=layout_map.get("title_scene", "title_only"),
             headline=_truncate(fingerprint.title_text, TITLE_MAX_WORDS),
         ))
 
@@ -121,7 +132,19 @@ def apply_rules(
 
 
 def _get_layout(routing: dict[str, str], content_type: str) -> str:
-    return routing.get(content_type, content_type)
+    # Map reel-specific names to template layout names
+    layout_map = {
+        "title_scene": "title_only",
+        "stat_scene": "title_and_content",
+        "bullet_scene": "title_and_content",
+        "image_scene": "picture_with_caption",
+        "cta_scene": "title_only",
+        "quote_scene": "title_only",
+        "list_scene": "title_and_content",
+        "section_scene": "section_header",
+    }
+    template_name = layout_map.get(content_type, content_type)
+    return routing.get(template_name, template_name)
 
 
 def _truncate(text: str | None, max_words: int) -> str | None:
