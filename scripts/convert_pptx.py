@@ -34,6 +34,7 @@ def main():
     parser.add_argument("--api-base", help="API base URL")
     parser.add_argument("--auto-approve", action="store_true", help="Auto-approve slides with score >= 80")
     parser.add_argument("--auto-approve-threshold", type=float, default=80.0, help="Auto-approve threshold (default: 80)")
+    parser.add_argument("--interactive", "-i", action="store_true", help="Interactive mode: edit scenes before rendering")
     
     args = parser.parse_args()
     
@@ -55,6 +56,8 @@ def main():
     print(f"🤖 Model: {args.model} (preset: {args.preset})")
     if args.auto_approve:
         print(f"⚡ Auto-approve: enabled (threshold: {args.auto_approve_threshold})")
+    if args.interactive:
+        print(f"📝 Interactive mode: edit scenes before rendering")
     print()
     
     # Initialize orchestrator
@@ -93,6 +96,10 @@ def main():
         print(f"  📋 Plan: {len(plan.scenes)} scene(s)")
         for scene in plan.scenes:
             print(f"    - {scene.layout}: {scene.headline or scene.stat_number or scene.body_items or 'image'}")
+        
+        # Interactive editing mode
+        if args.interactive:
+            plan = _interactive_edit(plan, slide_num)
         
         # Render individual slide scenes
         output_pptx = str(output_dir / f"slide_{slide_num}_scenes.pptx")
@@ -195,6 +202,69 @@ def _combine_scenes(scenes, template_config, output_path, original_images=None):
         template_config=template_config,
         output_path=output_path,
         original_images=original_images,
+    )
+
+
+def _interactive_edit(plan, slide_num):
+    """Allow user to edit scenes before rendering."""
+    from reel_converter.gate2_plan.content_editor import edit_scene_text
+    
+    print(f"\n  📝 Interactive editing for Slide {slide_num}")
+    print("  (Press Enter to keep current value, or type new text)")
+    
+    new_scenes = []
+    for i, scene in enumerate(plan.scenes):
+        print(f"\n  Scene {i+1}: {scene.layout}")
+        
+        # Edit headline
+        if scene.headline:
+            new_headline = input(f"    Headline [{scene.headline}]: ").strip()
+            if new_headline:
+                scene = edit_scene_text(scene, headline=new_headline)
+        
+        # Edit body items
+        if scene.body_items:
+            new_body = []
+            for j, item in enumerate(scene.body_items):
+                new_item = input(f"    Body {j+1} [{item}]: ").strip()
+                new_body.append(new_item if new_item else item)
+            scene = edit_scene_text(scene, body_items=new_body)
+        
+        # Edit stat number
+        if scene.stat_number:
+            new_stat = input(f"    Stat [{scene.stat_number}]: ").strip()
+            if new_stat:
+                scene = edit_scene_text(scene, stat_number=new_stat)
+        
+        # Edit stat label
+        if scene.stat_label:
+            new_label = input(f"    Label [{scene.stat_label}]: ").strip()
+            if new_label:
+                scene = edit_scene_text(scene, stat_label=new_label)
+        
+        # Edit quote
+        if scene.quote_text:
+            new_quote = input(f"    Quote [{scene.quote_text}]: ").strip()
+            if new_quote:
+                scene = edit_scene_text(scene, quote_text=new_quote)
+        
+        # Edit CTA
+        if scene.cta_headline:
+            new_cta = input(f"    CTA [{scene.cta_headline}]: ").strip()
+            if new_cta:
+                scene = edit_scene_text(scene, cta_headline=new_cta)
+        
+        new_scenes.append(scene)
+    
+    # Create new plan with edited scenes
+    from reel_converter.schemas.scene_plan import ScenePlan
+    return ScenePlan(
+        slide_number=plan.slide_number,
+        original_fingerprint=plan.original_fingerprint,
+        scenes=new_scenes,
+        coverage=plan.coverage,
+        reasoning=plan.reasoning + " (edited interactively)",
+        simplifications=plan.simplifications,
     )
 
 
