@@ -1,0 +1,41 @@
+{
+  "input": "tests/fixtures/complex_test.pptx",
+  "template": "reel_clean",
+  "model": "auto",
+  "preset": "balanced",
+  "total_slides": 5,
+  "total_scenes": 7,
+  "slide_results": [
+    {
+      "slide": 1,
+      "scenes": 1,
+      "passed": true,
+      "output": "output_complex/slide_1_scenes.pptx"
+    },
+    {
+      "slide": 2,
+      "scenes": 2,
+      "passed": true,
+      "output": "output_complex/slide_2_scenes.pptx"
+    },
+    {
+      "slide": 3,
+      "scenes": 1,
+      "passed": true,
+      "output": "output_complex/slide_3_scenes.pptx"
+    },
+    {
+      "slide": 4,
+      "scenes": 2,
+      "passed": true,
+      "output": "output_complex/slide_4_scenes.pptx"
+    },
+    {
+      "slide": 5,
+      "scenes": 1,
+      "passed": true,
+      "output": "output_complex/slide_5_scenes.pptx"
+    }
+  ],
+  "combined_output": "output_complex/combined_reel.pptx"
+}

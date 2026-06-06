@@ -44,6 +44,7 @@ class Orchestrator:
         result = SlideResult(fingerprint=fingerprint, slide_number=fingerprint.slide_number)
 
         # Gate 2: Plan
+        scene_plan = None
         for attempt in range(self.max_gate2_retries + 1):
             try:
                 if use_ai and self.api_key:
@@ -70,6 +71,10 @@ class Orchestrator:
                     scene_plan = plan_slide(fingerprint, self.template_config)
                     result.scene_plan = scene_plan
                     break
+        
+        # Ensure scene_plan is always set even if coverage check fails
+        if scene_plan and not result.scene_plan:
+            result.scene_plan = scene_plan
 
         # Gate 3: Render
         for attempt in range(self.max_gate3_retries + 1):

@@ -18,13 +18,13 @@ def scan_all_slides(file_path: str, template_style: str = "reel_clean") -> list[
     theme = extract_theme(prs)
     fingerprints = []
     for idx, slide in enumerate(prs.slides, start=1):
-        fp = scan_slide(slide, idx, theme)
+        fp = scan_slide(slide, idx, theme, prs.slide_height)
         fingerprints.append(fp)
     return fingerprints
 
 
-def scan_slide(slide, slide_number: int, theme) -> SlideFingerprint:
-    elements = parse_slide(slide)
+def scan_slide(slide, slide_number: int, theme, slide_height: int = 9144000) -> SlideFingerprint:
+    elements = parse_slide(slide, slide_height)
     title_text = None
     body_texts = []
     bullet_items = []
@@ -41,7 +41,7 @@ def scan_slide(slide, slide_number: int, theme) -> SlideFingerprint:
     all_text = []
 
     for el in elements:
-        el_type = classify_shape(el)
+        el_type = classify_shape(el, elements)
         if el_type == "title" and el.get("text"):
             title_text = el["text"].strip()
             all_text.append(title_text)
@@ -51,6 +51,9 @@ def scan_slide(slide, slide_number: int, theme) -> SlideFingerprint:
             for para in el.get("paragraphs", []):
                 text = para.get("text", "").strip()
                 if text:
+                    # Strip bullet prefix if present
+                    if text.startswith("• ") or text.startswith("- ") or text.startswith("* "):
+                        text = text[2:]
                     bullet_items.append(text)
         elif el_type == "image":
             image_count += 1
