@@ -5,4 +5,4 @@ from .slide_model import SlideModel, Element, Theme
 from .render_result import RenderedScene, PreQualityCheck
 from .verification_result import VerificationResult, ThemeConsistency, TypographyCheck, WhitespaceCheck
 from .approval import ApprovalDecision, ApprovalAction
-from .generation_result import GenerationResult, SlideResult, FinalReport
+from .generation_result import SlideResult, FinalReport

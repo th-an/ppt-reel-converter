@@ -23,13 +23,16 @@ def extract_theme(prs: Presentation) -> Theme:
                         if run.font.name and not theme.header_font:
                             theme.header_font = run.font.name
                             theme.body_font = run.font.name
-                        if run.font.color and run.font.color.rgb:
-                            rgb = str(run.font.color.rgb)
-                            if not theme.primary_color:
-                                theme.primary_color = rgb
-                            elif not theme.secondary_color:
-                                theme.secondary_color = rgb
-                            break
+                        try:
+                            if run.font.color and run.font.color.rgb:
+                                rgb = str(run.font.color.rgb)
+                                if not theme.primary_color:
+                                    theme.primary_color = rgb
+                                elif not theme.secondary_color:
+                                    theme.secondary_color = rgb
+                                    break
+                        except AttributeError:
+                            continue
                     break
             break
         break

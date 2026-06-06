@@ -32,13 +32,16 @@ def _parse_shape(shape) -> dict | None:
         for para in shape.text_frame.paragraphs:
             runs_text = []
             for run in para.runs:
-                runs_text.append(run.text)
-                el["font_name"] = run.font.name
-                el["font_size"] = run.font.size
-                el["font_bold"] = run.font.bold
-                el["font_italic"] = run.font.italic
-                if run.font.color and run.font.color.rgb:
-                    el["font_color"] = str(run.font.color.rgb)
+                    runs_text.append(run.text)
+                    el["font_name"] = run.font.name
+                    el["font_size"] = run.font.size
+                    el["font_bold"] = run.font.bold
+                    el["font_italic"] = run.font.italic
+                    try:
+                        if run.font.color and run.font.color.rgb:
+                            el["font_color"] = str(run.font.color.rgb)
+                    except AttributeError:
+                        pass
             para_text = "".join(runs_text).strip()
             if para_text:
                 paragraphs.append({"text": para_text, "level": para.level})
