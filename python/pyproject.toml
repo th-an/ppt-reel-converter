@@ -1,0 +1,12 @@
+[project]
+name = "ppt-reel-converter"
+version = "0.1.0"
+description = "Convert landscape PPTX to Instagram Reel (9:16) portrait scenes with AI-assisted layout and 4-gate validation"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

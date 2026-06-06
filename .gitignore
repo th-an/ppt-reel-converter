@@ -1,0 +1,14 @@
+node_modules/
+dist/
+out/
+.env
+*.pyc
+__pycache__/
+.DS_Store
+*.egg-info/
+.pytest_cache/
+output/
+*.pptx
+!python/reel_converter/templates/*.pptx
+venv/
+.venv/
