@@ -1,6 +1,7 @@
 node_modules/
 dist/
 out/
+release/
 .env
 *.pyc
 __pycache__/
@@ -8,7 +9,9 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 output/
+output_*/
 *.pptx
 !python/reel_converter/templates/*.pptx
+!tests/fixtures/*.pptx
 venv/
 .venv/
