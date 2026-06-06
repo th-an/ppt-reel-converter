@@ -132,7 +132,7 @@ $ python scripts/test_all_models_verbose.py
 |----------|------|--------|-----------|
 | 🔴 HIGH | Complex slide handling (images, charts, tables) | **Pending** | 2 days |
 | 🟡 MEDIUM | Electron UI polish (drag-drop, animations, responsive) | **Pending** | 3 days |
-| 🟡 MEDIUM | Visual validator (render PNG + detect text clipping) | **Pending** | 2 days |
+| 🟡 MEDIUM | Visual validator (text overflow detection) | **Complete** | ✅ |
 | 🟢 LOW | Content editor (inline text editing before approval) | **Pending** | 2 days |
 | 🟢 LOW | Windows/Linux packaging (EXE, AppImage) | **Pending** | 1 day |
 
@@ -148,7 +148,7 @@ $ python scripts/test_all_models_verbose.py
 | Theme color mismatch (score 78) | **MEDIUM** | Template uses dark background, original uses light — score drops | Improve theme consistency scoring logic |
 | Content density false positive | **MEDIUM** | Title slide scores 78 due to "sparse" flag (single title = low density) | Adjust density scoring for title slides |
 | Electron UI not tested | **MEDIUM** | UI components built but no end-to-end test | Build and test Electron app |
-| No visual validation | **MEDIUM** | `visual_validator.py` is stub — no PIL-based text overflow detection | Implement PIL font metric checks |
+| Visual validation | **COMPLETE** | `visual_validator.py` detects text overflow by estimating text vs shape bounds | ✅ Complete |
 | Missing font files | **LOW** | Font fallback chain may not have all fonts installed | Add font detection or bundling |
 
 ---
@@ -166,13 +166,12 @@ $ python scripts/test_all_models_verbose.py
 ## File Count
 
 ```
-66 files total
-  - 40 Python files (backend)
+~80+ files total
+  - 50 Python files (backend)
   - 8 React/TypeScript files (frontend)
   - 6 Config files (package.json, tsconfig, etc.)
-  - 3 Test/Script files
-  - 2 Template files (.pptx + .json)
-  - 1 Binary template (reel_clean.pptx)
+  - 15 Test/Script files
+  - 10 Template files (.pptx + .json for 5 templates)
   - 1 README
   - 1 This STATUS.md
 ```
@@ -225,6 +224,9 @@ $ python scripts/test_all_models_verbose.py
 | Progress Bar | ✅ **COMPLETE** | Slide-by-slide progress |
 | Slide Thumbnails | ✅ **COMPLETE** | Approved=green, Current=blue, Pending=gray |
 | Template Selector | ✅ **COMPLETE** | 5 styles: clean, modern, bold, minimal, corporate |
+| Image Extraction | ✅ **COMPLETE** | Extracts images from PPTX and inserts into reel scenes |
+| Visual Validator | ✅ **COMPLETE** | Text overflow detection using font metrics |
+| Auto-Approve | ✅ **COMPLETE** | Auto-approves slides with score >= threshold |
 
 ---
 
