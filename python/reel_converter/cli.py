@@ -17,14 +17,32 @@ from reel_converter.schemas.template_config import TemplateConfig
 
 def main():
     parser = argparse.ArgumentParser(description="PPT Reel Converter — Landscape to 9:16 Portrait")
-    parser.add_argument("input", help="Path to landscape PPTX file")
+    parser.add_argument("input", nargs="?", default=None, help="Path to landscape PPTX file")
     parser.add_argument("--template", default="reel_clean", help="Template style (default: reel_clean)")
     parser.add_argument("--output-dir", default="./output", help="Output directory")
     parser.add_argument("--api-key", default=None, help="OpenCode Go API key (optional)")
-    parser.add_argument("--model", default="deepseek-v4-flash", help="OpenCode Go model")
+    parser.add_argument("--model", default="deepseek-v4-flash", help="OpenCode Go model (default: deepseek-v4-flash)")
+    parser.add_argument("--preset", default="balanced", choices=["fast", "balanced", "capable", "cheap"], help="Model preset (default: balanced)")
+    parser.add_argument("--temperature", type=float, default=0.3, help="AI temperature (default: 0.3)")
     parser.add_argument("--use-ai", action="store_true", help="Use AI for layout decisions")
     parser.add_argument("--auto-approve", action="store_true", help="Auto-approve slides scoring >= 80")
+    parser.add_argument("--list-models", action="store_true", help="List available models and exit")
     args = parser.parse_args()
+
+    if args.list_models:
+        from .gate2_plan.ai_agent import MODEL_REGISTRY, PRESETS
+        print("\nAvailable OpenCode Go Models:")
+        print("=" * 60)
+        for name, info in MODEL_REGISTRY.items():
+            print(f"  {name:20s} {info['type']:8s} ${info['cost_per_1k']:.5f}/1K tokens  {info['format']}")
+        print("\nPresets:")
+        for preset, models in PRESETS.items():
+            print(f"  {preset:10s} {', '.join(models)}")
+        print()
+        return
+    
+    if not args.input:
+        parser.error("the following arguments are required: input (or use --list-models)")
 
     template_dir = Path(__file__).parent / "templates"
     template_path = str(template_dir / f"{args.template}.pptx")
@@ -40,12 +58,20 @@ def main():
         generate_config(template_config, str(template_dir))
 
     print(f"Scanning: {args.input}")
-    orchestrator = Orchestrator(template_config, api_key=args.api_key)
+    orchestrator = Orchestrator(
+        template_config,
+        api_key=args.api_key,
+        model=args.model,
+        preset=args.preset,
+        temperature=args.temperature,
+    )
     fingerprints = orchestrator.scan_all(args.input)
 
     print(f"Found {len(fingerprints)} slides")
     print(f"Template: {args.template}")
     print(f"AI: {'enabled' if args.use_ai else 'disabled'}")
+    if args.use_ai:
+        print(f"Model: {args.model} (preset: {args.preset}, temp: {args.temperature})")
     print()
 
     approval = ApprovalManager()

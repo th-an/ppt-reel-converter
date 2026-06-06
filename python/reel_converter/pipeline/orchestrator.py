@@ -15,9 +15,19 @@ from ..gate4_verify import verify_slide
 
 
 class Orchestrator:
-    def __init__(self, template_config: TemplateConfig, api_key: str | None = None):
+    def __init__(
+        self,
+        template_config: TemplateConfig,
+        api_key: str | None = None,
+        model: str = "deepseek-v4-flash",
+        preset: str = "balanced",
+        temperature: float = 0.3,
+    ):
         self.template_config = template_config
         self.api_key = api_key
+        self.model = model
+        self.preset = preset
+        self.temperature = temperature
         self.results: list[SlideResult] = []
         self.max_gate2_retries = 3
         self.max_gate3_retries = 2
@@ -42,6 +52,9 @@ class Orchestrator:
                         template_config=self.template_config,
                         catalog_markdown="",
                         api_key=self.api_key,
+                        model=self.model,
+                        preset=self.preset,
+                        temperature=self.temperature,
                     )
                 else:
                     scene_plan = plan_slide(fingerprint, self.template_config)

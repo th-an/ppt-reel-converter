@@ -31,6 +31,8 @@ async def plan_slide_with_ai(
     catalog_markdown: str,
     api_key: str,
     model: str = "deepseek-v4-flash",
+    preset: str = "balanced",
+    temperature: float = 0.3,
 ) -> ScenePlan:
     try:
         from .ai_agent import get_layout_decision
@@ -40,6 +42,8 @@ async def plan_slide_with_ai(
             catalog_markdown=catalog_markdown,
             api_key=api_key,
             model=model,
+            preset=preset,
+            temperature=temperature,
         )
         scenes = ai_result.get("scenes", [])
         parsed = []

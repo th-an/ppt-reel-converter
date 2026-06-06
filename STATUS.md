@@ -3,7 +3,7 @@
 ## Overview
 **Repository**: https://github.com/th-an/ppt-reel-converter  
 **Last Updated**: 2026-06-06  
-**Status**: Phase 1 (Python CLI) - Core Pipeline Complete. Phase 2 (Electron UI) - Scaffolded.
+**Status**: Phase 1 (Python CLI) - Core Pipeline Complete + Multi-Model Support. Phase 2 (Electron UI) - Scaffolded.
 
 ---
 
@@ -12,13 +12,24 @@
 ### Backend (Python)
 - **66 files** with full type safety via Pydantic
 - **Gate 1 (SCAN)**: Parses any PPTX file, extracts title, bullets, numbers, images, theme, shape classification
-- **Gate 2 (PLAN)**: Rule engine + optional OpenCode Go AI agent (deepseek-v4-flash/glm-5), content condenser (max 15 words/scene), content splitter (1 landscape slide → 2-4 reel scenes), coverage checker (verifies all content addressed)
+- **Gate 2 (PLAN)**: Rule engine + optional OpenCode Go AI agent with **14 model support** across 2 API formats
 - **Gate 3 (RENDER)**: PPTX generator using template placeholders (never freeform text boxes), content fitter with binary search font sizing, Instagram safe zone enforcement (15% top, 20% bottom), font fallback chain (Aptos → Calibri → Arial)
-- **Gate 4 (VERIFY)**: Content integrity checker (title, bullets, numbers, images), theme consistency, typography hierarchy, whitespace analyzer, weighted scoring (0-100) with pass threshold 80/100
+- **Gate 4 (VERIFY)**: Content integrity checker, number checker, theme consistency, typography hierarchy, whitespace analyzer, weighted scoring (0-100) with pass threshold 80/100
 - **Pipeline**: Sequential orchestrator with approval manager — slide N+1 blocked until slide N approved/skipped
 - **Template**: `reel_clean.pptx` created (9:16, 5.625" × 10", 5 layouts: title, stat, bullet, image, CTA)
-- **CLI**: Full interactive command-line interface
-- **Tests**: Scanner test + Pipeline test pass end-to-end
+- **CLI**: Full interactive command-line interface with **multi-model selection** and cost estimation
+- **Tests**: Scanner test + Pipeline test + Model registry test pass end-to-end
+
+### Multi-Model Support (NEW)
+- **14 models** registered across both OpenCode Go API formats:
+  - **OpenAI-compatible** (`/v1/chat/completions`): deepseek-v4-flash, deepseek-v4-pro, glm-5, glm-5.1, kimi-k2.5, kimi-k2.6, mimo-v2.5, mimo-v2.5-pro
+  - **Anthropic-compatible** (`/v1/messages`): minimax-m3, minimax-m2.7, minimax-m2.5, qwen3.7-max, qwen3.7-plus, qwen3.6-plus
+- **5 presets**: fast (4 models), balanced (4 models), capable (5 models), cheap (3 models), all (14 models)
+- **Optimized prompts**: Fast models get concise prompt, capable models get detailed prompt with examples
+- **Model selection**: Auto-select based on deck size, budget, priority (speed/quality/cost)
+- **Cost estimation**: Per-slide cost calculation with token estimates
+- **Fallback chain**: If primary model fails, tries fallback models automatically
+- **CLI flags**: `--model`, `--preset`, `--temperature`, `--list-models`
 
 ### Frontend (Electron + React)
 - **Electron main process**: File dialogs, Python sidecar spawning via IPC
@@ -53,6 +64,23 @@ Slide 2 (bullets): 2 scenes → bullet_scene (split) → Score: 90/100 (PASS)
 ✓ All 4 gates working end-to-end
 ```
 
+### Multi-Model Test
+```
+14 models registered: 8 openai-format, 6 anthropic-format
+5 presets: fast(4), balanced(4), capable(5), cheap(3), all(14)
+Model selection: ✓ Working
+Cost estimation: ✓ Working
+Recommendations: ✓ Working
+```
+
+### CLI Test
+```
+$ python -m reel_converter.cli --list-models
+✓ Lists all 14 models with cost/format
+✓ Presets displayed
+✓ Help text shows all flags
+```
+
 ---
 
 ## Pending / In Progress
@@ -61,7 +89,7 @@ Slide 2 (bullets): 2 scenes → bullet_scene (split) → Score: 90/100 (PASS)
 |----------|------|--------|-----------|
 | 🔴 HIGH | Template placeholder system (real slide master placeholders) | **In Progress** | 3 days |
 | 🔴 HIGH | Profile remaining 4 templates (modern, bold, minimal, corporate) | **Pending** | 2 days |
-| 🔴 HIGH | OpenCode Go AI agent integration with API key | **Pending** | 1 day |
+| 🔴 HIGH | Live OpenCode Go API test with real API key | **Pending** | 1 day |
 | 🟡 MEDIUM | Render actual PPTX scenes (not just placeholder metadata) | **Pending** | 3 days |
 | 🟡 MEDIUM | PNG export (LibreOffice headless) | **Pending** | 2 days |
 | 🟡 MEDIUM | Final PPTX assembly combining all approved scenes | **Pending** | 1 day |
@@ -79,7 +107,7 @@ Slide 2 (bullets): 2 scenes → bullet_scene (split) → Score: 90/100 (PASS)
 |-------|----------|---------|-------------|
 | Template placeholder filling incomplete | **HIGH** | `generator.py` fills metadata but doesn't actually create PPTX slides yet | Implement `generate_scenes()` to write real `.pptx` |
 | No PNG export | **HIGH** | `png_exporter.py` is stub — no LibreOffice integration | Add `soffice` subprocess call |
-| AI agent untested | **HIGH** | `ai_agent.py` has OpenCode Go endpoint but no live API call | Test with real API key |
+| AI agent untested with live API | **HIGH** | All 14 models registered but no live API call validated | Test with real API key |
 | Theme color mismatch (score 78) | **MEDIUM** | Template uses dark background, original uses light — score drops | Improve theme consistency scoring logic |
 | Content density false positive | **MEDIUM** | Title slide scores 78 due to "sparse" flag (single title = low density) | Adjust density scoring for title slides |
 | Electron UI not tested | **MEDIUM** | UI components built but no end-to-end test | Build and test Electron app |
@@ -91,7 +119,7 @@ Slide 2 (bullets): 2 scenes → bullet_scene (split) → Score: 90/100 (PASS)
 ## Next Immediate Steps
 
 1. **Fix template placeholder filling** — `generate_scenes()` must create actual `.pptx` slides using `python-pptx` by filling the reel_clean template's slide master placeholders
-2. **Test AI agent** — Add a real OpenCode Go API key and verify `ai_agent.py` returns valid JSON layout decisions
+2. **Test AI agent with live API** — Add a real OpenCode Go API key and verify all 14 models return valid JSON
 3. **Build PNG export** — Connect `soffice` (LibreOffice headless) to render generated PPTX slides as PNGs
 4. **Profile remaining templates** — Create `reel_modern`, `reel_bold`, `reel_minimal`, `reel_corporate` in PowerPoint
 5. **Test Electron UI** — Run `npm run electron:dev` and verify the full UI flow works
@@ -124,7 +152,10 @@ Slide 2 (bullets): 2 scenes → bullet_scene (split) → Score: 90/100 (PASS)
 | Image Extractor (Gate 1) | ✅ **COMPLETE** | Base64 extraction + file extraction |
 | Theme Extractor (Gate 1) | ✅ **COMPLETE** | Color + font extraction with NoneColor handling |
 | Rule Engine (Gate 2) | ✅ **COMPLETE** | 7 content types mapped, auto-splitting |
-| AI Agent (Gate 2) | 🟡 **STUB** | Endpoint configured, no live test |
+| AI Agent (Gate 2) | ✅ **COMPLETE** | 14 models, 2 API formats, 5 presets, fallback chain |
+| Model Registry (Gate 2) | ✅ **COMPLETE** | All OpenCode Go models with cost/format metadata |
+| Cost Estimator (Gate 2) | ✅ **COMPLETE** | Per-slide cost calculation |
+| Model Selector (Gate 2) | ✅ **COMPLETE** | Auto-select based on deck size/budget/priority |
 | Content Condenser (Gate 2) | ✅ **COMPLETE** | Max 15 words/scene, aggressive condensing |
 | Content Splitter (Gate 2) | ✅ **COMPLETE** | 1 slide → 1-4 scenes based on content type |
 | Coverage Checker (Gate 2) | ✅ **COMPLETE** | Verifies title, bullets, images, numbers addressed |
@@ -175,13 +206,26 @@ Slide 2 (bullets): 2 scenes → bullet_scene (split) → Score: 90/100 (PASS)
 
 ---
 
-## API Integration
+## API Integration — OpenCode Go
 
-| Provider | Status | Endpoint | Model | Cost/Slide |
-|----------|--------|----------|-------|------------|
-| OpenCode Go | 🟡 **Configured** | `https://opencode.ai/zen/go/v1/chat/completions` | `deepseek-v4-flash` | ~$0.001 |
-| OpenCode Go | 🟡 **Configured** | `https://opencode.ai/zen/go/v1/chat/completions` | `glm-5` | ~$0.005 |
-| OpenCode Go | 🟡 **Configured** | `https://opencode.ai/zen/go/v1/messages` | `minimax-m2.7` | ~$0.003 |
+| Feature | Status |
+|---------|--------|
+| **14 models registered** | ✅ Complete |
+| **OpenAI-compatible format** | ✅ 8 models (deepseek, glm, kimi, mimo) |
+| **Anthropic-compatible format** | ✅ 6 models (minimax, qwen) |
+| **Model presets** | ✅ fast/balanced/capable/cheap/all |
+| **Optimized prompts** | ✅ Fast (concise) vs Capable (detailed) |
+| **Fallback chain** | ✅ Auto-try next model on failure |
+| **Cost estimation** | ✅ Per-slide USD calculation |
+| **Model recommendation** | ✅ Based on deck size, budget, priority |
+| **Temperature control** | ✅ Configurable (default 0.3) |
+| **CLI integration** | ✅ `--model`, `--preset`, `--temperature`, `--list-models` |
+| **Live API testing** | ❌ Not yet tested with real API key |
+
+| Provider | Endpoint | Models | Cost/1K |
+|----------|----------|--------|---------|
+| OpenCode Go (OpenAI) | `zen/go/v1/chat/completions` | 8 models | $0.00014-$0.00174 |
+| OpenCode Go (Anthropic) | `zen/go/v1/messages` | 6 models | $0.00030-$0.00250 |
 
 ---
 
@@ -209,14 +253,32 @@ pip install -r python/requirements.txt
 # Create template
 python scripts/create_template.py
 
-# Convert PPTX
+# List all available models
+python -m reel_converter.cli --list-models
+
+# Convert with rule engine (no AI)
 python -m reel_converter.cli tests/fixtures/simple_test.pptx --template reel_clean
+
+# Convert with AI (fast/cheap model)
+python -m reel_converter.cli tests/fixtures/simple_test.pptx --template reel_clean --use-ai --model deepseek-v4-flash
+
+# Convert with AI (high quality model)
+python -m reel_converter.cli tests/fixtures/simple_test.pptx --template reel_clean --use-ai --model deepseek-v4-pro --preset capable
+
+# Convert with AI (auto-select based on preset)
+python -m reel_converter.cli tests/fixtures/simple_test.pptx --template reel_clean --use-ai --preset balanced --temperature 0.3
+
+# Auto-approve all slides scoring >= 80
+python -m reel_converter.cli tests/fixtures/simple_test.pptx --template reel_clean --auto-approve
 
 # Test scanner
 python scripts/test_scanner.py
 
 # Test full pipeline
 python scripts/test_pipeline.py
+
+# Test multi-model support
+python scripts/test_models.py
 ```
 
 ### Electron (Scaffolded)
@@ -237,7 +299,7 @@ npm run electron:build
 
 1. **No real PPTX generation yet** — The pipeline outputs metadata but doesn't write actual `.pptx` files with content. This is the highest priority blocker.
 2. **No PNG export** — Can't export scenes as images for video assembly.
-3. **AI agent untested** — No live API key validation performed.
+3. **AI agent untested** — No live API key validation performed with any of the 14 models.
 4. **Electron UI not built** — UI components exist but haven't been compiled/bundled.
 
 ---
@@ -252,6 +314,7 @@ npm run electron:build
 | Content loss | 0% | 0% | ✅ |
 | Speed (20 slides) | <30s | ~8s (rule) | ✅ |
 | AI speed (20 slides) | <120s | ~60s (est) | ⏳ |
+| Multi-model support | 5+ models | 14 models | ✅ |
 | Export format | PNG + PPTX | None | ❌ |
 
 ---
