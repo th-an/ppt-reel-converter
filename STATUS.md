@@ -221,12 +221,37 @@ $ python -m reel_converter.cli --list-models
 | **Model recommendation** | ✅ Based on deck size, budget, priority |
 | **Temperature control** | ✅ Configurable (default 0.3) |
 | **CLI integration** | ✅ `--model`, `--preset`, `--temperature`, `--list-models` |
-| **Live API testing** | ❌ Not yet tested with real API key |
+| **Live API testing** | ✅ Tested with real API key |
 
-| Provider | Endpoint | Models | Cost/1K |
-|----------|----------|--------|---------|
-| OpenCode Go (OpenAI) | `zen/go/v1/chat/completions` | 8 models | $0.00014-$0.00174 |
-| OpenCode Go (Anthropic) | `zen/go/v1/messages` | 6 models | $0.00030-$0.00250 |
+| Provider | Endpoint | Models | Cost/1K | Status |
+|----------|----------|--------|---------|--------|
+| OpenCode Go (OpenAI) | `zen/go/v1/chat/completions` | 8 models | $0.00014-$0.00174 | 6/8 working |
+| OpenCode Go (Anthropic) | `zen/go/v1/messages` | 6 models | $0.00030-$0.00250 | 0/6 working (401) |
+
+### API Test Results
+
+**Working Models (6/14):**
+- `deepseek-v4-flash` ✅ (fast, cheap)
+- `deepseek-v4-pro` ✅ (capable, expensive)
+- `kimi-k2.5` ✅ (balanced)
+- `kimi-k2.6` ✅ (balanced)
+- `mimo-v2.5` ✅ (balanced)
+- `mimo-v2.5-pro` ✅ (capable)
+
+**Failing Models (8/14):**
+- `glm-5` ❌ (empty response)
+- `glm-5.1` ❌ (empty response)
+- `minimax-m3` ❌ (401 Unauthorized)
+- `minimax-m2.7` ❌ (401 Unauthorized)
+- `minimax-m2.5` ❌ (401 Unauthorized)
+- `qwen3.7-max` ❌ (401 Unauthorized)
+- `qwen3.7-plus` ❌ (401 Unauthorized)
+- `qwen3.6-plus` ❌ (401 Unauthorized)
+
+**Notes:**
+- Anthropic endpoint (`/v1/messages`) returns 401 for all models — likely API key doesn't have access
+- GLM models return empty response — possibly model not available or API issue
+- Rule engine fallback ensures conversion works even when AI models fail
 
 ---
 
