@@ -1,0 +1,83 @@
+{
+  "template_name": "reel_minimal",
+  "template_path": "python/reel_converter/templates/reel_minimal.pptx",
+  "dimensions": {
+    "width_emu": 5143500,
+    "height_emu": 9144000
+  },
+  "safe_zone": {
+    "top_pct": 0.15,
+    "bottom_pct": 0.2
+  },
+  "brand": {
+    "primary_color": "0196FF",
+    "secondary_color": "000000",
+    "accent_color": "595959",
+    "header_font": "Aptos",
+    "body_font": "Aptos"
+  },
+  "layout_mappings": {
+    "title_slide": {
+      "layout_index": 0,
+      "layout_name": "title_slide",
+      "use_case": "title"
+    },
+    "title_and_content": {
+      "layout_index": 1,
+      "layout_name": "title_and_content",
+      "use_case": "bullets"
+    },
+    "section_header": {
+      "layout_index": 2,
+      "layout_name": "section_header",
+      "use_case": "title"
+    },
+    "two_content": {
+      "layout_index": 3,
+      "layout_name": "two_content",
+      "use_case": "bullets"
+    },
+    "comparison": {
+      "layout_index": 4,
+      "layout_name": "comparison",
+      "use_case": "bullets"
+    },
+    "title_only": {
+      "layout_index": 5,
+      "layout_name": "title_only",
+      "use_case": "title"
+    },
+    "blank": {
+      "layout_index": 6,
+      "layout_name": "blank",
+      "use_case": null
+    },
+    "content_with_caption": {
+      "layout_index": 7,
+      "layout_name": "content_with_caption",
+      "use_case": "bullets"
+    },
+    "picture_with_caption": {
+      "layout_index": 8,
+      "layout_name": "picture_with_caption",
+      "use_case": "title"
+    },
+    "title_and_vertical_text": {
+      "layout_index": 9,
+      "layout_name": "title_and_vertical_text",
+      "use_case": "title"
+    },
+    "vertical_title_and_text": {
+      "layout_index": 10,
+      "layout_name": "vertical_title_and_text",
+      "use_case": "title"
+    }
+  },
+  "content_type_routing": {
+    "section": "section_header"
+  },
+  "requires_branding_slide": true,
+  "branding_layout_index": null,
+  "fallback_layout_index": 0,
+  "fallback_layout_name": "title_slide"
+}
