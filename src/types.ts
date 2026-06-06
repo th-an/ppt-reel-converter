@@ -136,3 +136,18 @@ export interface TemplateConfig {
   content_type_routing: Record<string, string>;
   fallback_layout_name: string;
 }
+
+declare global {
+  interface Window {
+    electronAPI: {
+      selectFile: () => Promise<string | null>;
+      selectOutputDir: () => Promise<string | null>;
+      startPythonSidecar: (args: {
+        filePath: string;
+        templateStyle: string;
+        apiKey?: string;
+        useAi?: boolean;
+      }) => Promise<{ success: boolean; output: string }>;
+    };
+  }
+}
